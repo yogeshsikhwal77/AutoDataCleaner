@@ -6,17 +6,23 @@ class DataStructurer:
     def __init__(self, df: pd.DataFrame):
         self.df = df.copy()
 
-    def date_time(self):
-        time_cols = [col for col in self.df.columns if any(word in col for word in ['Year','Yr','Mo'])]
+    def date_time(self,cyclic_month_cols):
 
-        for col in time_cols:
-            print(f"found temporal feature/date column: {col}")
+        if cyclic_month_cols is None:
+            cyclic_month_cols =[]
+        
 
-            if 'Mo' in col:
+        for col in cyclic_month_cols:
+            if col in self.df.columns:
+                print(f"found temporal feature/date column: {col}")
+
+         
                 self.df[col +'_sin'] = np.sin(2 * np.pi* self.df[col]/12)
                 self.df[col +'_cos'] = np.cos(2 * np.pi* self.df[col]/12)
                 self.df.drop(columns=[col],inplace = True)
                 print(f"coverted '{col}' into cyclic sin/cos waves")
+            else:
+                print("temporal coloum not fouund in dataset")
 
         return self.df
         
@@ -55,7 +61,7 @@ if __name__ == "__main__":
 
         structure =DataStructurer(fake_data)
 
-        structure.date_time()
+        structure.date_time('datacoloum')
 
         structure.feature_splitting('OverallQual','GrLivArea','QualXarea',operation='multiply')
 

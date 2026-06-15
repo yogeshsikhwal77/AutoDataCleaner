@@ -46,8 +46,11 @@ class DataInspector:
 
         for col in cat_cols:
             if self.df[col].isnull().sum() > 0:
-                self.df[col] = self.df[col].fillna(self.df[col].mode()[0])
-        print(self.df.isnull().sum())
+                mode_vals = self.df[col].mode()
+                if not mode_vals.empty:
+                    self.df[col] = self.df[col].fillna(mode_vals[0])
+                else:
+                    self.df.drop(columns=[col],inplace=True)
 
         return self.df
     
@@ -58,18 +61,18 @@ class DataInspector:
             p_25 = self.df[col].quantile(0.25)
             p_75 = self.df[col].quantile(0.75)
             iqr = p_75 - p_25
-            max = p_75 + 1.5 * iqr
-            min = p_25 - 1.5 * iqr
+            upper_bound = p_75 + 1.5 * iqr
+            lower_bound = p_25 - 1.5 * iqr
 
-            outliers = ((self.df[col] < min) | (self.df[col] > max)).sum()
+            outliers = ((self.df[col] < lower_bound) | (self.df[col] > upper_bound)).sum()
             outlier_capped += outliers
 
             self.df[col] = np.where(
-                self.df[col] > max,
-                max,
+                self.df[col] > upper_bound,
+                upper_bound,
                 np.where(
-                    self.df[col] < min,
-                    min,
+                    self.df[col] < lower_bound,
+                    lower_bound,
                     self.df[col]
                 )
             )

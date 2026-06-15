@@ -5,7 +5,7 @@ from inspection import DataInspector
 from structuring import DataStructurer
 from transformations import DataTransformer
 
-def run_auto_cleaner(file_path: str,target_col: str):
+def run_auto_cleaner(file_path: str,target_col: str,months_cols=None):
 
     df = pd.read_csv(file_path)
     inspector = DataInspector(df)
@@ -17,20 +17,22 @@ def run_auto_cleaner(file_path: str,target_col: str):
     inspector.handle_outliers()
     clean_df = inspector.df  # get the clean dataframe
 
-    structure =DataStructurer(df)
-    structure.date_time()
-    structure.feature_splitting('OverallQual','GrLivArea','QualXarea',operation='multiply')
-    X_train,X_test,y_train,y_test = structure.split(target_column='SalePrice')
+    transformer = DataTransformer(clean_df)
+    transformer.encode_categorian()
+    transformer.handle_skewness()
+
+    encoded_df = transformer.df
+
+    structure =DataStructurer(encoded_df)
+    structure.date_time(cyclic_month_cols=months_cols)
+    # structure.feature_splitting('OverallQual','GrLivArea','QualXarea',operation='multiply')
+    X_train,X_test,y_train,y_test = structure.split(target_column=target_col)
 
     train_transformer = DataTransformer(X_train)
-    train_transformer.encode_categorian()
-    train_transformer.handle_skewness()
-    X_train_clean = train_transformer.scale_featurs()
+    X_train_clean,saved_scaler = train_transformer.scale_featurs(fitted_scaler=None)
 
     test_transformer = DataTransformer(X_test)
-    test_transformer.encode_categorian()
-    test_transformer.handle_skewness()
-    X_test_clean = test_transformer.scale_featurs()
+    X_test_clean = test_transformer.scale_featurs(fitted_scaler=saved_scaler)
 
     os.makedirs('data/processed',exist_ok = True)
 
@@ -46,7 +48,10 @@ def run_auto_cleaner(file_path: str,target_col: str):
 
 if __name__ == '__main__':
     try:
-        run_auto_cleaner(file_path = 'data/raw/train.csv',target_col = 'SalePrice')
+        run_auto_cleaner(file_path = 'data/raw/train.csv',
+                         target_col = 'SalePrice',
+                         months_cols=[]
+        )
 
     except Exception as e:
         print(f"Pipeline failed: {e}")

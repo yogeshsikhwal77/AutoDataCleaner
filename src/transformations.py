@@ -30,15 +30,17 @@ class DataTransformer:
 
         return self.df
     
-    def scale_featurs(self):
+    def scale_featurs(self,fitted_scaler=None):
         num_col = self.df.select_dtypes(include=np.number).columns.tolist()
-        scaler = StandardScaler()
-
         num_col_only = [col for col in num_col if self.df[col].dtype != 'bool']
 
-        self.df[num_col_only] = scaler.fit_transform(self.df[num_col_only])
-
-        return self.df
+        if fitted_scaler is None:
+            scaler = StandardScaler()
+            self.df[num_col_only] = scaler.fit_transform(self.df[num_col_only])
+            return self.df,scaler
+        else:
+            self.df[num_col_only] = scaler.fit_transform(self.df[num_col_only])
+            return self.df
 
     
 
