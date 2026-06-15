@@ -1,3 +1,12 @@
 venv/
 env/
 .env
+
+__pycache__/
+*.pyc
+
+data/raw/*
+data/processed/*
+!data/raw/sample.csv  # tiny sample dataset for demonstration
+
+.ipynb_checkpoints/
