@@ -14,7 +14,7 @@ class DataInspector:
         text_cols = self.df.select_dtypes(exclude = np.number).columns.tolist()
 
         print(f"Found {len(num_cols)} Number columns: {num_cols}")
-        print(f"Found {len(text_cols)} Number columns: {text_cols}")
+        print(f"Found {len(text_cols)} Text columns: {text_cols}")
         return num_cols,text_cols
 
     def histogram(self, column_name):

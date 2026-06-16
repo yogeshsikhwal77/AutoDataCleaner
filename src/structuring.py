@@ -61,7 +61,7 @@ if __name__ == "__main__":
 
         structure =DataStructurer(fake_data)
 
-        structure.date_time('datacoloum')
+        structure.date_time(['datacoloum'])
 
         structure.feature_splitting('OverallQual','GrLivArea','QualXarea',operation='multiply')
 

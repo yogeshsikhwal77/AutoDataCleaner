@@ -39,7 +39,7 @@ class DataTransformer:
             self.df[num_col_only] = scaler.fit_transform(self.df[num_col_only])
             return self.df,scaler
         else:
-            self.df[num_col_only] = scaler.fit_transform(self.df[num_col_only])
+            self.df[num_col_only] = fitted_scaler.transform(self.df[num_col_only])
             return self.df
 
     
