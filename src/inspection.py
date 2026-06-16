@@ -28,17 +28,26 @@ class DataInspector:
            plt.show()
 
         else:
-            print("error : column not found or a column is not numerical")
+            print(f"[WARNING] Cannot plot histogram: '{column_name}' not found or is not numerical.")
 
     def dublicaterowsdrop(self):
         initial_row = len(self.df)
         self.df.drop_duplicates(inplace=True)
         final_row = len(self.df)
-        print("Total row dropped :" , initial_row-final_row)
+        dropped = initial_row - final_row
+        if dropped > 0:
+            print(f"[INFO] Removed {dropped} duplicate rows. Remaining rows: {final_row}")
+        else:
+            print("[INFO] No duplicate rows found.")
         return self.df
     
     def handle_missing_value(self):
-        print(self.df.isnull().sum())
+        missing_count = self.df.isnull().sum()
+        missing_cols = missing_count[missing_count>0]
+        if missing_cols.empty:
+            print("[INFO] No missing values found in dataset")
+        else:
+            print(f"[INFO] Found missing data in {len(missing_cols)} columns. Applying median/mode imputation") 
         num_cols , cat_cols = self.auto_column_detection()
         for col in num_cols:
             if self.df[col].isnull().sum() > 0:
@@ -51,6 +60,7 @@ class DataInspector:
                     self.df[col] = self.df[col].fillna(mode_vals[0])
                 else:
                     self.df.drop(columns=[col],inplace=True)
+                    print(f"[WARNING] Dropped column '{col} entirely because it only contained missing values.")
 
         return self.df
     
@@ -77,7 +87,10 @@ class DataInspector:
                 )
             )
 
-        print(f"Total Outlier detect: ",outlier_capped)
+        if outlier_capped > 0:
+            print(f"[INFO] Outliers: Capped a total of {outlier_capped} extreme values across numerical columns using the IQR method.")
+        else:
+            print("[INFO] Outliers: No significant outliers detected.")
         return self.df
 
 

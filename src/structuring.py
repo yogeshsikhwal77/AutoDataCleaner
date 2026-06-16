@@ -14,15 +14,15 @@ class DataStructurer:
 
         for col in cyclic_month_cols:
             if col in self.df.columns:
-                print(f"found temporal feature/date column: {col}")
+                print(f"[INFO] found temporal feature/date column: {col}")
 
          
                 self.df[col +'_sin'] = np.sin(2 * np.pi* self.df[col]/12)
                 self.df[col +'_cos'] = np.cos(2 * np.pi* self.df[col]/12)
                 self.df.drop(columns=[col],inplace = True)
-                print(f"coverted '{col}' into cyclic sin/cos waves")
+                print(f"[INFO]coverted '{col}' into cyclic sin/cos waves")
             else:
-                print("temporal coloum not fouund in dataset")
+                print("[WARNING] temporal coloum not fouund in dataset")
 
         return self.df
         
@@ -34,9 +34,9 @@ class DataStructurer:
             elif operation == 'add':
                 self.df[new_col] = self.df[col1] +  self.df[col2]
 
-            print(f"synthesized new feture: {new_col}")
+            print(f"[INFO] synthesized new feture: {new_col}")
         else:
-            print(f"skipping synthesis: coloumns '{col1}' or '{col2}' not found")
+            print(f"[WARNING] skipping synthesis: coloumns '{col1}' or '{col2}' not found")
         return self.df
 
     def split(self , target_column: str,test_size = 0.2,random_state: int=42):
@@ -48,8 +48,8 @@ class DataStructurer:
         
         X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=test_size,random_state=random_state)
 
-        print(f"Training feature(X_train) : {X_train}")
-        print(f"testing feature(X_test) : {X_test}")
+        print(f"[INFO] Training feature(X_train) : {X_train}")
+        print(f"[INFO] testing feature(X_test) : {X_test}")
         return X_train,X_test,y_train,y_test
 
 
